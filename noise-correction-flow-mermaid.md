@@ -46,7 +46,7 @@ flowchart LR
     S2 --> S2h
   end
 
-  RP -->|to_set_measurement_spec()| S1
+  RP --> S1
 
   SV["noiseninja.Solver(spec).\nsolve_and_translate()\n-> solution + status"]:::box
   Spec_Construction --> SV
