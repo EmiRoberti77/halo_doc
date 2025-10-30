@@ -116,16 +116,28 @@ The Kingdom is the orchestrator/control-plane:
 
 ```mermaid
 flowchart TB
-  MC[MC Request] --> Auth[AuthZ & Policy Check]
-  Auth --> PBM[Privacy Budget Mgmt]
-  PBM --> RQ[Create Requisitions]
-  RQ --> SCH[Schedule MPC Job]
-  SCH --> ORC[Run Protocol Across Duchies]
-  ORC --> COL[Collect Duchy Outputs]
-  COL --> QC[Validation & Consistency Checks]
-  QC --> NOISE[Noise Application (if required)]
-  NOISE --> PERSIST[Persist to Reporting Store]
-  PERSIST --> RESP[Serve Results to MC]
+  MC[MC Request]
+  Auth[AuthZ & Policy Check]
+  PBM[Privacy Budget Mgmt]
+  RQ[Create Requisitions]
+  SCH[Schedule MPC Job]
+  ORC[Run Protocol Across Duchies]
+  COL[Collect Duchy Outputs]
+  QC[Validation and Consistency Checks]
+  NOISE[Noise Application]
+  PERSIST[Persist to Reporting Store]
+  RESP[Serve Results to MC]
+
+  MC --> Auth
+  Auth --> PBM
+  PBM --> RQ
+  RQ --> SCH
+  SCH --> ORC
+  ORC --> COL
+  COL --> QC
+  QC --> NOISE
+  NOISE --> PERSIST
+  PERSIST --> RESP
 ```
 
 ### Cryptographic protocols and MPC flows
