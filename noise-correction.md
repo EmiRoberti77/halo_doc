@@ -28,6 +28,9 @@ These are organized in:
 6. Large corrections are logged and captured in the `ReportPostProcessorResult`.
 7. Pre-/post-correction data quality summaries are included in the result.
 
+<img width="7503" height="2679" alt="halo_nc-2025-10-30-104857" src="https://github.com/user-attachments/assets/51ccc10b-d554-4b07-ba5d-c75c52867b5a" />
+
+
 ### Key normalization detail
 
 - Before adding measurements to the spec, sigmas are normalized by the max sigma across all measurements so that the optimization is well-scaled:
