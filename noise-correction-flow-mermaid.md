@@ -49,7 +49,7 @@ flowchart LR
   RP --> S1
 
   SV["noiseninja.Solver(spec).\nsolve_and_translate()\n-> solution + status"]:::box
-  Spec_Construction --> SV
+  S2h --> SV
 
   subgraph Reconstruction["Reconstruction: report_from_solution"]
     direction TB
@@ -65,13 +65,13 @@ flowchart LR
   Qpre["Pre-correction quality\n(zero-variance consistency; union CI)"]:::note
   Qpost["Post-correction quality\n(zero-variance consistency; union CI)"]:::note
 
-  RP -->|get_report_quality()| Qpre
-  RC -->|get_report_quality()| Qpost
-  RP -->|compare original vs corrected| L
+  RP --> Qpre
+  RC --> Qpost
+  RP --> L
 
   RES["ReportPostProcessorResult\nstatus, pre/post quality, large_corrections"]:::box
   RC --> RES
-  SV -->|status| RES
+  SV --> RES
   Qpre --> RES
   Qpost --> RES
   L --> RES
