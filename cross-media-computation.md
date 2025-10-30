@@ -157,22 +157,22 @@ LLv2 multi-duchy data exchange (simplified):
 ```mermaid
 flowchart LR
   subgraph Ingestion
-    E1[EDP 1] --> Prep1[Prepare sketch (encrypt/obfuscate)]
-    E2[EDP 2] --> Prep2[Prepare sketch (encrypt/obfuscate)]
-    E3[EDP 3] --> Prep3[Prepare sketch (encrypt/obfuscate)]
+    E1[EDP 1] --> Prep1[Prepare sketch encrypt obfuscate]
+    E2[EDP 2] --> Prep2[Prepare sketch encrypt obfuscate]
+    E3[EDP 3] --> Prep3[Prepare sketch encrypt obfuscate]
   end
 
-  Prep1 --> D1["Duchy A"]
-  Prep2 --> D2["Duchy B"]
-  Prep3 --> D3["Duchy C"]
+  Prep1 --> D1[Duchy A]
+  Prep2 --> D2[Duchy B]
+  Prep3 --> D3[Duchy C]
 
-  D1 --> M1[Secure combine/permute]
-  D2 --> M2[Secure combine/permute]
-  D3 --> M3[Secure combine/permute]
+  D1 --> M1[Secure combine permute]
+  D2 --> M2[Secure combine permute]
+  D3 --> M3[Secure combine permute]
 
   M1 --> M2
   M2 --> M3
-  M3 --> OUT[Union/k+ reach estimate]
+  M3 --> OUT[Union and kplus reach estimate]
 ```
 
 Note: The repo contains proto packages under `src/main/proto/wfa` including `rlwe` and `private_membership` interfaces that back encryption, shuffling, and private set/aggregate operations in various workflows.
@@ -181,15 +181,15 @@ Note: The repo contains proto packages under `src/main/proto/wfa` including `rlw
 
 ```mermaid
 flowchart TB
-  Define[MC defines measurement\n(metrics, filters, window)]
+  Define[MC defines measurement]
   Submit[MC submits to Kingdom]
-  Validate[AuthZ, schema, budget]
+  Validate[Auth and schema and budget]
   Reqs[Requisitions to EDPs]
   Prep[EDPs prepare encrypted inputs]
   MPC[Kingdom schedules MPC across Duchies]
   Run[Run LLv2 rounds]
   Collect[Collect outputs]
-  Check[Quality & consistency checks]
+  Check[Quality and consistency checks]
   Noise[Apply required noise]
   Store[Persist to reporting DB]
   Deliver[Deliver results to MC]
@@ -205,7 +205,7 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-  Raw[Aggregates from MPC] --> NoiseStep[Apply calibrated noise (policy)] --> Consistency[Constraint-based correction\n(reach/k-reach/impressions)] --> Final[Final report values]
+  Raw[Aggregates from MPC] --> NoiseStep[Apply calibrated noise policy] --> Consistency[Constraint based correction reach kreach impressions] --> Final[Final report values]
 ```
 
 ### Failure handling, retries, and data integrity (abridged)
