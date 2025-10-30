@@ -1,0 +1,86 @@
+digraph NoiseCorrectionFlow {
+  rankdir=LR;
+  compound=true;
+  fontsize=11;
+  labelloc="t";
+  label="Noise Correction Flow (report.py)";
+
+  node [shape=box, style=rounded, fontsize=10];
+
+  subgraph cluster_inputs {
+    label="Inputs";
+    style=dashed;
+    color=gray60;
+    WeeklyCumulative [label="Weekly cumulative reach\n(by EDP combination)\n(value, sigma, name)"];
+    WholeCampaign [label="Whole campaign\nreach, k-reach (k=1..F), impressions\n(value, sigma, name)"];
+    WeeklyNonCumulative [label="Weekly non-cumulative\nreach, k-reach, impressions\n(value, sigma, name)"];
+  }
+
+  MetricReport [label="MetricReport\n(getters for all measurements)" shape=component];
+  Report [label="Report\n(aggregates metrics, relationships, population)" shape=component];
+
+  WeeklyCumulative -> MetricReport;
+  WholeCampaign -> MetricReport;
+  WeeklyNonCumulative -> MetricReport;
+  MetricReport -> Report [label="per-metric"];
+
+  subgraph cluster_spec {
+    label="Spec construction (to_set_measurement_spec)";
+    color=gray60; style=dashed;
+
+    AddMeasurements [label="_add_*_measurements_to_spec\n(normalize sigma; preserve 0 as fixed)"];
+    AddRelations [label="_add_set_relations_to_spec\nadds constraints:"];
+
+    Subsets [label="subset relations\n(child ≤ parent; reach ≤ impressions)"];
+    Covers [label="cover relations\n(sum(children) ≥ union)"];
+    Overlaps [label="overlap constraints\n(ordered sets inequalities)"];
+    Cumulative [label="cumulative monotonicity\n(non-decreasing over time)"];
+    CumVsTotal [label="final cumulative = whole campaign reach"];
+    KReachEqual [label="reach = Σ_k k-reach"];
+    ImprBound [label="impressions ≥ Σ_k k·(k-reach)"];
+    CrossMetric [label="cross-metric ordering\n(child metric ≤ parent metric)"];
+
+    AddMeasurements -> AddRelations;
+    AddRelations -> Subsets;
+    AddRelations -> Covers;
+    AddRelations -> Overlaps;
+    AddRelations -> Cumulative;
+    AddRelations -> CumVsTotal;
+    AddRelations -> KReachEqual;
+    AddRelations -> ImprBound;
+    AddRelations -> CrossMetric;
+  }
+
+  Report -> AddMeasurements [lhead=cluster_spec, label="to_set_measurement_spec()"];
+
+  Solver [label="noiseninja.Solver(spec).\nsolve_and_translate()\n→ solution + status", shape=ellipse];
+  AddRelations -> Solver [ltail=cluster_spec];
+
+  subgraph cluster_solution {
+    label="Reconstruction (report_from_solution)";
+    color=gray60; style=dashed;
+    MapIndices [label="map solution indices → measurement names"];
+    BuildMetricReports [label="rebuild MetricReport(s)\n(cumulative, whole, weekly non-cumulative)"];
+    CorrectedReport [label="Corrected Report", shape=component];
+    MapIndices -> BuildMetricReports -> CorrectedReport;
+  }
+
+  Solver -> MapIndices [lhead=cluster_solution];
+
+  LargeCorr [label="Large correction check\n|Δ| > max(7·sigma, 1) → log + record", shape=note];
+  QualityPre [label="Pre-correction quality\n(zero-variance consistency; union CI)", shape=note];
+  QualityPost [label="Post-correction quality\n(zero-variance consistency; union CI)", shape=note];
+
+  Report -> QualityPre [label="get_report_quality()"];
+  CorrectedReport -> QualityPost [label="get_report_quality()"];
+  Report -> LargeCorr [label="compare original vs corrected", ltail=cluster_solution];
+
+  Result [label="ReportPostProcessorResult\nstatus, pre/post quality, large_corrections", shape=folder];
+  CorrectedReport -> Result;
+  Solver -> Result [label="status"];
+  QualityPre -> Result;
+  QualityPost -> Result;
+  LargeCorr -> Result;
+}
+
+
