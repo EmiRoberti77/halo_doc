@@ -16,25 +16,21 @@ Contents
 
 ```mermaid
 flowchart LR
-  classDef svc fill:#eef7ff,stroke:#2b6cb0,rx:4px,ry:4px;
-  classDef store fill:#f9f9f9,stroke:#777,rx:4px,ry:4px;
-  classDef ext fill:#fff,stroke:#333,rx:4px,ry:4px;
-
-  MC["Measurement Consumer (MC)\n(Advertiser/Agency/Publisher Analytics)"]:::ext
-  Kingdom["Kingdom\n(Control-plane orchestration)\n- API & job scheduler\n- State, requisitions, results"]:::svc
+  MC["Measurement Consumer (MC)\n(Advertiser/Agency/Publisher Analytics)"]
+  Kingdom["Kingdom\n(Control-plane orchestration)\n- API & job scheduler\n- State, requisitions, results"]
   subgraph Duchies["Duchies (MPC Aggregators)"]
     direction LR
-    D1["Duchy A\n(Secure compute shard)"]:::svc
-    D2["Duchy B\n(Secure compute shard)"]:::svc
-    D3["Duchy C\n(Secure compute shard)"]:::svc
+    D1["Duchy A\n(Secure compute shard)"]
+    D2["Duchy B\n(Secure compute shard)"]
+    D3["Duchy C\n(Secure compute shard)"]
   end
   subgraph EDPs["Event Data Providers (EDPs)"]
     direction LR
-    E1["EDP 1"]:::ext
-    E2["EDP 2"]:::ext
-    E3["EDP 3"]:::ext
+    E1["EDP 1"]
+    E2["EDP 2"]
+    E3["EDP 3"]
   end
-  Store["Result Storage / Reporting DB"]:::store
+  Store["Result Storage / Reporting DB"]
 
   MC --> Kingdom
   Kingdom --> EDPs
@@ -120,18 +116,16 @@ The Kingdom is the orchestrator/control-plane:
 
 ```mermaid
 flowchart TB
-  classDef svc fill:#eef7ff,stroke:#2b6cb0,rx:4px,ry:4px;
-  classDef step fill:#fdf6ec,stroke:#b7791f,rx:4px,ry:4px;
-  MC[MC Request] --> Auth[AuthZ & Policy Check]:::step
-  Auth --> PBM[Privacy Budget Mgmt]:::svc
-  PBM --> RQ[Create Requisitions]:::step
-  RQ --> SCH[Schedule MPC Job]:::svc
-  SCH --> ORC[Run Protocol Across Duchies]:::step
-  ORC --> COL[Collect Duchy Outputs]:::step
-  COL --> QC[Validation & Consistency Checks]:::step
-  QC --> NOISE[Noise Application (if required)]:::step
-  NOISE --> PERSIST[Persist to Reporting Store]:::svc
-  PERSIST --> RESP[Serve Results to MC]:::svc
+  MC[MC Request] --> Auth[AuthZ & Policy Check]
+  Auth --> PBM[Privacy Budget Mgmt]
+  PBM --> RQ[Create Requisitions]
+  RQ --> SCH[Schedule MPC Job]
+  SCH --> ORC[Run Protocol Across Duchies]
+  ORC --> COL[Collect Duchy Outputs]
+  COL --> QC[Validation & Consistency Checks]
+  QC --> NOISE[Noise Application (if required)]
+  NOISE --> PERSIST[Persist to Reporting Store]
+  PERSIST --> RESP[Serve Results to MC]
 ```
 
 ### Cryptographic protocols and MPC flows
@@ -150,25 +144,23 @@ LLv2 multi-duchy data exchange (simplified):
 
 ```mermaid
 flowchart LR
-  classDef svc fill:#eef7ff,stroke:#2b6cb0,rx:4px,ry:4px;
-  classDef step fill:#fdf6ec,stroke:#b7791f,rx:4px,ry:4px;
   subgraph Ingestion
-    E1[EDP 1] --> Prep1[Prepare sketch (encrypt/obfuscate)]:::step
-    E2[EDP 2] --> Prep2[Prepare sketch (encrypt/obfuscate)]:::step
-    E3[EDP 3] --> Prep3[Prepare sketch (encrypt/obfuscate)]:::step
+    E1[EDP 1] --> Prep1[Prepare sketch (encrypt/obfuscate)]
+    E2[EDP 2] --> Prep2[Prepare sketch (encrypt/obfuscate)]
+    E3[EDP 3] --> Prep3[Prepare sketch (encrypt/obfuscate)]
   end
 
-  Prep1 --> D1["Duchy A"]:::svc
-  Prep2 --> D2["Duchy B"]:::svc
-  Prep3 --> D3["Duchy C"]:::svc
+  Prep1 --> D1["Duchy A"]
+  Prep2 --> D2["Duchy B"]
+  Prep3 --> D3["Duchy C"]
 
-  D1 --> M1[Secure combine/permute]:::step
-  D2 --> M2[Secure combine/permute]:::step
-  D3 --> M3[Secure combine/permute]:::step
+  D1 --> M1[Secure combine/permute]
+  D2 --> M2[Secure combine/permute]
+  D3 --> M3[Secure combine/permute]
 
   M1 --> M2
   M2 --> M3
-  M3 --> OUT[Union/k+ reach estimate]:::step
+  M3 --> OUT[Union/k+ reach estimate]
 ```
 
 Note: The repo contains proto packages under `src/main/proto/wfa` including `rlwe` and `private_membership` interfaces that back encryption, shuffling, and private set/aggregate operations in various workflows.
@@ -177,22 +169,18 @@ Note: The repo contains proto packages under `src/main/proto/wfa` including `rlw
 
 ```mermaid
 flowchart TB
-  classDef step fill:#fdf6ec,stroke:#b7791f,rx:4px,ry:4px;
-  classDef svc fill:#eef7ff,stroke:#2b6cb0,rx:4px,ry:4px;
-  classDef ok fill:#f9f9f9,stroke:#777,rx:4px,ry:4px;
-
-  Define[MC defines measurement\n(metrics, filters, window)]:::step
-  Submit[MC submits to Kingdom]:::svc
-  Validate[AuthZ, schema, budget]:::step
-  Reqs[Requisitions to EDPs]:::step
-  Prep[EDPs prepare encrypted inputs]:::step
-  MPC[Kingdom schedules MPC across Duchies]:::svc
-  Run[Run LLv2 rounds]:::step
-  Collect[Collect outputs]:::step
-  Check[Quality & consistency checks]:::step
-  Noise[Apply required noise]:::step
-  Store[Persist to reporting DB]:::ok
-  Deliver[Deliver results to MC]:::svc
+  Define[MC defines measurement\n(metrics, filters, window)]
+  Submit[MC submits to Kingdom]
+  Validate[AuthZ, schema, budget]
+  Reqs[Requisitions to EDPs]
+  Prep[EDPs prepare encrypted inputs]
+  MPC[Kingdom schedules MPC across Duchies]
+  Run[Run LLv2 rounds]
+  Collect[Collect outputs]
+  Check[Quality & consistency checks]
+  Noise[Apply required noise]
+  Store[Persist to reporting DB]
+  Deliver[Deliver results to MC]
 
   Define --> Submit --> Validate --> Reqs --> Prep --> MPC --> Run --> Collect --> Check --> Noise --> Store --> Deliver
 ```
@@ -205,8 +193,7 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-  classDef step fill:#fdf6ec,stroke:#b7791f,rx:4px,ry:4px;
-  Raw[Aggregates from MPC]:::step --> NoiseStep[Apply calibrated noise (policy)]:::step --> Consistency[Constraint-based correction\n(reach/k-reach/impressions)]:::step --> Final[Final report values]
+  Raw[Aggregates from MPC] --> NoiseStep[Apply calibrated noise (policy)] --> Consistency[Constraint-based correction\n(reach/k-reach/impressions)] --> Final[Final report values]
 ```
 
 ### Failure handling, retries, and data integrity (abridged)
